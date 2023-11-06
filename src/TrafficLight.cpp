@@ -15,7 +15,7 @@ T MessageQueue<T>::receive()
     _condition.wait(lock, [this] { return !_queue.empty(); });
   
     T message = std::move(_queue.front());
-    _queue.pop();
+    _queue.pop_front();
     return message; // RVO
 }
 
@@ -25,7 +25,7 @@ void MessageQueue<T>::send(T&& message)
     // FP.4a : The method send should use the mechanisms std::lock_guard<std::mutex> 
     // as well as _condition.notify_one() to add a new message to the queue and afterwards send a notification.
     std::lock_guard<std::mutex> lock { _mutex };
-    _queue.push(std::move(message));
+    _queue.push_back(std::move(message));
     _condition.notify_one();
 }
 
